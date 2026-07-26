@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kazı Takip — Giriş</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --card2: #263349;
+    --yellow: #f59e0b;
+    --yellow-light: #fcd34d;
+    --muted: #64748b;
+    --muted2: #94a3b8;
+    --green: #22c55e;
+    --red: #ef4444;
+    --line: #334155;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh;
+    background: var(--bg);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: #e2e8f0;
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px;
+  }
+  .wrap { width: 100%; max-width: 360px; }
+  .top { text-align: center; margin-bottom: 20px; }
+  .logo {
+    width: 44px; height: 44px; border-radius: 12px; margin: 0 auto 12px;
+    background: linear-gradient(150deg, var(--yellow-light), var(--yellow));
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; color: #1e293b; font-size: 18px;
+  }
+  .top h1 { font-size: 17px; margin: 0 0 4px; }
+  .top p { font-size: 12.5px; color: var(--muted2); margin: 0; }
+
+  .tabs { display: flex; background: var(--card2); border-radius: 10px; padding: 3px; margin-bottom: 18px; }
+  .tab {
+    flex: 1; text-align: center; padding: 9px; border-radius: 8px;
+    font-size: 12.5px; font-weight: 700; color: var(--muted2); cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .tab.on { background: var(--yellow); color: #1e293b; }
+
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 22px; }
+  .field { margin-bottom: 13px; }
+  .field label { display: block; font-size: 11px; color: var(--muted2); margin-bottom: 6px; font-weight: 700; }
+  .field input {
+    width: 100%; background: var(--bg); border: 1px solid var(--line); border-radius: 9px;
+    padding: 11px 12px; color: #e2e8f0; font-size: 13.5px; font-family: inherit;
+  }
+  .field input:focus { outline: none; border-color: var(--yellow); }
+
+  .trial-badge {
+    display: flex; align-items: center; gap: 8px; background: rgba(34,197,94,0.1);
+    border: 1px solid rgba(34,197,94,0.3); border-radius: 9px; padding: 9px 12px;
+    font-size: 11.5px; color: #86efac; margin-bottom: 16px;
+  }
+
+  .btn {
+    width: 100%; border: none; border-radius: 10px; font-weight: 800;
+    font-size: 13.5px; padding: 12px; cursor: pointer;
+    background: linear-gradient(150deg, var(--yellow-light), var(--yellow)); color: #1e293b;
+    transition: opacity 0.15s ease, transform 0.1s ease;
+  }
+  .btn:active { transform: scale(0.98); }
+  .btn:disabled { opacity: 0.55; cursor: default; }
+
+  .msg { font-size: 12px; padding: 10px 12px; border-radius: 9px; margin-bottom: 14px; display: none; }
+  .msg.err { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; }
+  .msg.ok { background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.3); color: #86efac; }
+
+  .fineprint { text-align: center; font-size: 10.5px; color: var(--muted); margin-top: 14px; }
+  .forgot { text-align: right; font-size: 11px; color: var(--muted2); margin: -4px 0 14px; cursor: pointer; }
+</style>
+</head>
+<body>
+
+  <div class="wrap">
+    <div class="top">
+      <div class="logo">K</div>
+      <h1 id="topTitle">Firmanı Kaydet</h1>
+      <p id="topSub">14 günlük deneme hemen başlasın</p>
+    </div>
+
+    <div class="tabs">
+      <div class="tab on" id="tabSignup" onclick="switchTab('signup')">Kayıt Ol</div>
+      <div class="tab" id="tabLogin" onclick="switchTab('login')">Giriş Yap</div>
+    </div>
+
+    <div class="card">
+      <div class="msg" id="msgBox"></div>
+
+      <!-- KAYIT OL -->
+      <form id="signupForm" onsubmit="return false;">
+        <div class="trial-badge">✅ &nbsp;14 gün tüm özellikler açık, kart bilgisi istenmez</div>
+        <div class="field"><label>Firma Adı</label><input id="suFirma" placeholder="Müri İnşaat Ltd. Şti." required></div>
+        <div class="field"><label>Ad Soyad</label><input id="suAdSoyad" placeholder="Serdar Y." required></div>
+        <div class="field"><label>E-posta</label><input id="suEmail" type="email" placeholder="serdar@firmam.com" required></div>
+        <div class="field"><label>Şifre</label><input id="suSifre" type="password" placeholder="En az 6 karakter" required></div>
+        <button class="btn" id="suBtn" onclick="kayitOl()">14 Gün Ücretsiz Başlat</button>
+      </form>
+
+      <!-- GİRİŞ YAP -->
+      <form id="loginForm" style="display:none" onsubmit="return false;">
+        <div class="field"><label>E-posta</label><input id="liEmail" type="email" placeholder="serdar@firmam.com" required></div>
+        <div class="field" style="margin-bottom:8px;"><label>Şifre</label><input id="liSifre" type="password" placeholder="••••••••" required></div>
+        <div class="forgot">Şifremi unuttum</div>
+        <button class="btn" id="liBtn" onclick="girisYap()">Giriş Yap</button>
+      </form>
+    </div>
+
+    <div class="fineprint">kazitakip.com &middot; verileriniz güvenle saklanır</div>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = 'https://wqqdcowrtlvfruvsmtew.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_bfPBnm138vlmJa_z4Pi95w_EsYw2zkB';
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  function switchTab(which) {
+    const isSignup = which === 'signup';
+    document.getElementById('tabSignup').classList.toggle('on', isSignup);
+    document.getElementById('tabLogin').classList.toggle('on', !isSignup);
+    document.getElementById('signupForm').style.display = isSignup ? 'block' : 'none';
+    document.getElementById('loginForm').style.display = isSignup ? 'none' : 'block';
+    document.getElementById('topTitle').textContent = isSignup ? 'Firmanı Kaydet' : 'Tekrar hoş geldin';
+    document.getElementById('topSub').textContent = isSignup ? '14 günlük deneme hemen başlasın' : 'Devam etmek için giriş yap';
+    hideMsg();
+  }
+
+  function showMsg(text, type) {
+    const box = document.getElementById('msgBox');
+    box.textContent = text;
+    box.className = 'msg ' + type;
+    box.style.display = 'block';
+  }
+  function hideMsg() {
+    document.getElementById('msgBox').style.display = 'none';
+  }
+
+  function turkceHata(err) {
+    const m = (err && err.message) || '';
+    if (m.includes('already registered') || m.includes('already exists')) return 'Bu e-posta zaten kayıtlı. Giriş yapmayı dene.';
+    if (m.includes('Invalid login credentials')) return 'E-posta veya şifre hatalı.';
+    if (m.includes('Email not confirmed')) return 'E-postanı henüz onaylamadın. Gelen kutunda az önce gönderdiğimiz onay linkine tıkla.';
+    if (m.includes('Password should be at least')) return 'Şifre en az 6 karakter olmalı.';
+    if (m.includes('Unable to validate email')) return 'E-posta adresi geçersiz görünüyor.';
+    return 'Bir şeyler ters gitti: ' + m;
+  }
+
+  async function kayitOl() {
+    hideMsg();
+    const firma_adi = document.getElementById('suFirma').value.trim();
+    const ad_soyad = document.getElementById('suAdSoyad').value.trim();
+    const email = document.getElementById('suEmail').value.trim();
+    const sifre = document.getElementById('suSifre').value;
+
+    if (!firma_adi || !ad_soyad || !email || !sifre) {
+      showMsg('Lütfen tüm alanları doldur.', 'err'); return;
+    }
+
+    const btn = document.getElementById('suBtn');
+    btn.disabled = true; btn.textContent = 'Kaydediliyor...';
+
+    const { data, error } = await sb.auth.signUp({
+      email, password: sifre,
+      options: { data: { firma_adi, ad_soyad } }
+    });
+
+    btn.disabled = false; btn.textContent = '14 Gün Ücretsiz Başlat';
+
+    if (error) { showMsg(turkceHata(error), 'err'); return; }
+
+    if (data.session) {
+      showMsg('✅ Kayıt başarılı! ' + firma_adi + ' için 14 günlük deneme başladı, giriş yapıldı.', 'ok');
+      setTimeout(() => { window.location.href = 'app.html'; }, 900);
+    } else {
+      showMsg('📩 Kayıt alındı! ' + email + ' adresine gönderdiğimiz onay linkine tıklayınca 14 günlük deneme başlayacak.', 'ok');
+    }
+  }
+
+  async function girisYap() {
+    hideMsg();
+    const email = document.getElementById('liEmail').value.trim();
+    const sifre = document.getElementById('liSifre').value;
+
+    if (!email || !sifre) { showMsg('E-posta ve şifreni gir.', 'err'); return; }
+
+    const btn = document.getElementById('liBtn');
+    btn.disabled = true; btn.textContent = 'Giriş yapılıyor...';
+
+    const { data, error } = await sb.auth.signInWithPassword({ email, password: sifre });
+
+    btn.disabled = false; btn.textContent = 'Giriş Yap';
+
+    if (error) { showMsg(turkceHata(error), 'err'); return; }
+
+    showMsg('✅ Giriş başarılı, hoş geldin.', 'ok');
+    setTimeout(() => { window.location.href = 'app.html'; }, 500);
+  }
+</script>
+</body>
+</html>
