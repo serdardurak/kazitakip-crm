@@ -9,77 +9,101 @@
     --bg: #0f172a; --card: #1e293b; --card2: #263349;
     --yellow: #f59e0b; --yellow-light: #fcd34d;
     --muted: #64748b; --muted2: #94a3b8;
-    --green: #22c55e; --red: #ef4444; --line: #334155;
+    --green: #22c55e; --blue: #3b82f6; --red: #ef4444; --line: #334155;
   }
   * { box-sizing: border-box; }
   body {
     margin: 0; min-height: 100vh; background: var(--bg);
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    color: #e2e8f0;
+    color: #e2e8f0; padding-bottom: 70px;
   }
   .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-
   .header {
     background: var(--card); border-bottom: 2px solid var(--yellow);
-    padding: 14px 20px; display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px; display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 10;
   }
-  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand { display: flex; align-items: center; gap: 9px; }
   .logo {
-    width: 34px; height: 34px; border-radius: 9px;
+    width: 32px; height: 32px; border-radius: 8px;
     background: linear-gradient(150deg, var(--yellow-light), var(--yellow));
     display: flex; align-items: center; justify-content: center;
-    font-weight: 900; color: #1e293b; font-size: 14px;
+    font-weight: 900; color: #1e293b; font-size: 13px;
   }
-  .brand-title { font-size: 14px; font-weight: 900; color: var(--yellow); letter-spacing: 1px; }
-  .brand-sub { font-size: 10.5px; color: var(--muted); }
+  .brand-title { font-size: 12.5px; font-weight: 900; color: var(--yellow); letter-spacing: 1px; }
+  .brand-sub { font-size: 10px; color: var(--muted); }
   .logout-btn {
     background: var(--card2); border: 1px solid var(--line); color: var(--muted2);
-    border-radius: 9px; padding: 8px 14px; font-size: 12px; font-weight: 700; cursor: pointer;
+    border-radius: 9px; padding: 7px 12px; font-size: 11.5px; font-weight: 700; cursor: pointer;
   }
-
-  .container { max-width: 480px; margin: 0 auto; padding: 20px; }
-
+  .container { max-width: 480px; margin: 0 auto; padding: 16px; }
   .state-box { text-align: center; padding: 60px 20px; color: var(--muted2); font-size: 13px; }
-
-  .welcome-card {
-    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
-    padding: 20px; margin-bottom: 16px;
+  .err-box { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; border-radius: 10px; padding: 12px; font-size: 12px; margin-bottom: 12px; }
+  .ok-box { background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.3); color: #86efac; border-radius: 10px; padding: 12px; font-size: 12px; margin-bottom: 12px; }
+  .trial-badge {
+    display: flex; align-items: center; gap: 8px; background: rgba(245,158,11,0.1);
+    border: 1px solid rgba(245,158,11,0.3); border-radius: 9px; padding: 9px 12px;
+    font-size: 11.5px; color: var(--yellow-light); margin-bottom: 14px;
   }
-  .welcome-card h2 { font-size: 17px; margin: 0 0 4px; }
-  .welcome-card p { font-size: 12.5px; color: var(--muted2); margin: 0; }
-
-  .info-row {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 12px 0; border-bottom: 1px solid #1c2940; font-size: 13px;
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 13px; padding: 15px; margin-bottom: 12px; }
+  .card h3 { font-size: 13px; margin: 0 0 10px; color: #f1f5f9; }
+  .field { margin-bottom: 11px; }
+  .field label { display: block; font-size: 10.5px; color: var(--muted2); margin-bottom: 5px; font-weight: 700; }
+  .field input, .field select, .field textarea {
+    width: 100%; background: var(--bg); border: 1px solid var(--line); border-radius: 9px;
+    padding: 10px 11px; color: #e2e8f0; font-size: 13px; font-family: inherit;
   }
-  .info-row:last-child { border-bottom: none; }
-  .info-row .l { color: var(--muted2); }
-  .info-row .v { font-weight: 700; }
-
-  .role-pill { font-size: 10.5px; padding: 4px 10px; border-radius: 20px; font-weight: 700; }
+  .field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--yellow); }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .btn {
+    border: none; border-radius: 10px; font-weight: 800; font-size: 12.5px;
+    padding: 10px 16px; cursor: pointer;
+    background: linear-gradient(150deg, var(--yellow-light), var(--yellow)); color: #1e293b;
+  }
+  .btn.full { width: 100%; }
+  .btn:disabled { opacity: 0.5; cursor: default; }
+  .list-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0; border-bottom: 1px solid #1c2940; font-size: 12.5px;
+  }
+  .list-row:last-child { border-bottom: none; }
+  .list-row .del { color: var(--red); font-size: 11px; cursor: pointer; font-weight: 700; }
+  .muted { color: var(--muted2); }
+  .proj-card { border-left: 3px solid var(--yellow); }
+  .proj-card .name { font-weight: 800; font-size: 13.5px; color: var(--yellow-light); margin-bottom: 8px; }
+  .progress-bar { height: 7px; background: var(--bg); border-radius: 5px; overflow: hidden; margin: 6px 0; }
+  .progress-fill { height: 100%; background: var(--blue); }
+  .progress-label { display: flex; justify-content: space-between; font-size: 10.5px; color: var(--muted2); }
+  .tabs { display: flex; gap: 6px; margin-bottom: 14px; overflow-x: auto; }
+  .subtab {
+    flex-shrink: 0; padding: 8px 13px; border-radius: 8px; font-size: 11.5px; font-weight: 700;
+    background: var(--card2); color: var(--muted2); cursor: pointer;
+  }
+  .subtab.on { background: var(--yellow); color: #1e293b; }
+  .role-pill { font-size: 10px; padding: 3px 9px; border-radius: 20px; font-weight: 700; }
   .role-yonetici { background: rgba(245,158,11,0.14); color: var(--yellow-light); }
   .role-saha_personeli { background: rgba(59,130,246,0.14); color: #93c5fd; }
   .role-sadece_rapor { background: rgba(100,116,139,0.2); color: var(--muted2); }
-
-  .trial-badge {
-    display: flex; align-items: center; gap: 8px; background: rgba(34,197,94,0.1);
-    border: 1px solid rgba(34,197,94,0.3); border-radius: 9px; padding: 10px 12px;
-    font-size: 12px; color: #86efac; margin-bottom: 16px;
+  .status-pending { color: #fcd34d; }
+  .status-active { color: #86efac; }
+  .readonly-notice {
+    background: var(--card2); border: 1px dashed var(--line); border-radius: 10px;
+    padding: 12px; font-size: 11.5px; color: var(--muted2); text-align: center; margin-bottom: 12px;
   }
-
-  .placeholder-card {
-    background: var(--card2); border: 1px dashed var(--line); border-radius: 12px;
-    padding: 20px; text-align: center; color: var(--muted2); font-size: 12.5px;
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0; background: var(--card);
+    border-top: 1px solid var(--line); display: flex; z-index: 10;
   }
-
-  .err-box {
-    background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3);
-    color: #fca5a5; border-radius: 10px; padding: 14px; font-size: 12.5px;
+  .nav-btn {
+    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 9px 2px; background: none; border: none; color: var(--muted); font-size: 9.5px;
+    font-weight: 700; gap: 3px; cursor: pointer;
   }
+  .nav-btn .ic { font-size: 17px; }
+  .nav-btn.on { color: var(--yellow); }
 </style>
 </head>
 <body>
-
   <div class="header">
     <div class="brand">
       <div class="logo">K</div>
@@ -88,84 +112,294 @@
         <div class="brand-sub" id="firmaAdiHeader">—</div>
       </div>
     </div>
-    <div class="logout-btn" onclick="cikisYap()">Çıkış Yap</div>
+    <div class="logout-btn" onclick="cikisYap()">Çıkış</div>
   </div>
-
   <div class="container" id="container">
     <div class="state-box" id="loadingBox">Yükleniyor...</div>
   </div>
-
+  <nav class="bottom-nav" id="bottomNav" style="display:none">
+    <button class="nav-btn" id="nav-dashboard" onclick="gitView('dashboard')"><span class="ic">📊</span><span>Panel</span></button>
+    <button class="nav-btn" id="nav-kayit" onclick="gitView('kayit')"><span class="ic">➕</span><span>Kayıt</span></button>
+    <button class="nav-btn" id="nav-projeler" onclick="gitView('projeler')"><span class="ic">🏗</span><span>Projeler</span></button>
+    <button class="nav-btn" id="nav-giderler" onclick="gitView('giderler')"><span class="ic">💸</span><span>Giderler</span></button>
+    <button class="nav-btn" id="nav-yonetim" onclick="gitView('yonetim')"><span class="ic">⚙️</span><span>Yönetim</span></button>
+  </nav>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   const SUPABASE_URL = 'https://wqqdcowrtlvfruvsmtew.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_bfPBnm138vlmJa_z4Pi95w_EsYw2zkB';
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-  const rolEtiketleri = {
-    yonetici: 'Yönetici',
-    saha_personeli: 'Saha Personeli',
-    sadece_rapor: 'Sadece Rapor'
-  };
-  const planEtiketleri = {
-    deneme: 'Deneme Sürümü',
-    aktif: 'Aktif',
-    gecikmis: 'Gecikmiş Ödeme',
-    iptal: 'İptal Edildi'
-  };
+  const rolEtiketleri = { yonetici: 'Yönetici', saha_personeli: 'Saha Personeli', sadece_rapor: 'Sadece Rapor' };
+  let currentUser = null;
+  let currentFirma = null;
+  let lookups = { projeler: [], ekipler: [], denetimciler: [], malzeme_turleri: [], gider_kategorileri: [] };
+  let yonetimTab = 'ekipler';
+  const yazabilir = () => currentUser && currentUser.rol !== 'sadece_rapor';
+  const isim = (arr, id) => (arr.find(x => x.id === id) || {}).ad || '—';
 
   async function init() {
     const { data: { session } } = await sb.auth.getSession();
-
-    if (!session) {
-      window.location.href = 'auth.html';
-      return;
-    }
-
-    // Kendi profilini + bağlı olduğu firmayı RLS üzerinden çekiyoruz —
-    // burada başka bir firmanın verisi asla gelmez, sadece kendi firman.
+    if (!session) { window.location.href = 'index.html'; return; }
     const { data: profil, error } = await sb
       .from('kullanicilar')
-      .select('ad_soyad, email, rol, firma_id, firmalar ( ad, plan_durumu, deneme_bitis_tarihi )')
-      .eq('id', session.user.id)
-      .single();
-
-    const container = document.getElementById('container');
-
+      .select('id, ad_soyad, email, rol, firma_id, firmalar ( ad, plan_durumu, deneme_bitis_tarihi )')
+      .eq('id', session.user.id).single();
     if (error || !profil) {
-      container.innerHTML = `<div class="err-box">Profil bilgisi alınamadı: ${(error && error.message) || 'bilinmeyen hata'}</div>`;
+      document.getElementById('container').innerHTML = `<div class="err-box">Profil alınamadı: ${(error && error.message) || 'bilinmiyor'}</div>`;
       return;
     }
-
-    const firma = profil.firmalar;
-    document.getElementById('firmaAdiHeader').textContent = firma.ad;
-
-    const kalanGun = Math.max(0, Math.ceil((new Date(firma.deneme_bitis_tarihi) - new Date()) / 86400000));
-
-    container.innerHTML = `
-      <div class="welcome-card">
-        <h2>Hoş geldin, ${profil.ad_soyad.split(' ')[0]}</h2>
-        <p>${firma.ad}</p>
-      </div>
-
-      ${firma.plan_durumu === 'deneme' ? `
-        <div class="trial-badge">⏳ &nbsp;Deneme sürümünde ${kalanGun} gün kaldı</div>
-      ` : ''}
-
-      <div class="welcome-card">
-        <div class="info-row"><span class="l">E-posta</span><span class="v">${profil.email}</span></div>
-        <div class="info-row"><span class="l">Rol</span><span class="role-pill role-${profil.rol}">${rolEtiketleri[profil.rol] || profil.rol}</span></div>
-        <div class="info-row"><span class="l">Plan Durumu</span><span class="v">${planEtiketleri[firma.plan_durumu] || firma.plan_durumu}</span></div>
-      </div>
-
-      <div class="placeholder-card">
-        📊 Dashboard, Projeler, Kayıtlar ve diğer ekranlar sıradaki adımlarda buraya eklenecek.
-      </div>
-    `;
+    currentUser = { id: profil.id, firma_id: profil.firma_id, rol: profil.rol, ad_soyad: profil.ad_soyad, email: profil.email };
+    currentFirma = profil.firmalar;
+    document.getElementById('firmaAdiHeader').textContent = currentFirma.ad;
+    document.getElementById('bottomNav').style.display = 'flex';
+    await loadLookups();
+    gitView('dashboard');
   }
 
-  async function cikisYap() {
-    await sb.auth.signOut();
-    window.location.href = 'auth.html';
+  async function loadLookups() {
+    const [p, e, d, m, g] = await Promise.all([
+      sb.from('projeler').select('id, ad, konum, hedef_metre, durum').neq('durum', 'silindi').order('ad'),
+      sb.from('ekipler').select('id, ad').order('ad'),
+      sb.from('denetimciler').select('id, ad, kurum').order('ad'),
+      sb.from('malzeme_turleri').select('id, ad').order('ad'),
+      sb.from('gider_kategorileri').select('id, ad').order('ad'),
+    ]);
+    lookups.projeler = p.data || [];
+    lookups.ekipler = e.data || [];
+    lookups.denetimciler = d.data || [];
+    lookups.malzeme_turleri = m.data || [];
+    lookups.gider_kategorileri = g.data || [];
+  }
+
+  function gitView(v) {
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('on'));
+    document.getElementById('nav-' + v).classList.add('on');
+    ({ dashboard: renderDashboard, kayit: renderKayit, projeler: renderProjeler, giderler: renderGiderler, yonetim: renderYonetim })[v]();
+  }
+
+  async function cikisYap() { await sb.auth.signOut(); window.location.href = 'index.html'; }
+
+  function toast(container, msg, ok) {
+    const box = document.createElement('div');
+    box.className = ok ? 'ok-box' : 'err-box';
+    box.textContent = msg;
+    container.prepend(box);
+    setTimeout(() => box.remove(), 3500);
+  }
+
+  async function renderDashboard() {
+    const c = document.getElementById('container');
+    c.innerHTML = `<div class="state-box">Yükleniyor...</div>`;
+    const kalanGun = Math.max(0, Math.ceil((new Date(currentFirma.deneme_bitis_tarihi) - new Date()) / 86400000));
+    const { data: kayitlar } = await sb.from('kayitlar').select('proje_id, metraj');
+    const projeKarti = lookups.projeler.filter(p => p.durum === 'aktif').map(p => {
+      const toplam = (kayitlar || []).filter(k => k.proje_id === p.id).reduce((s, k) => s + Number(k.metraj), 0);
+      const yuzde = p.hedef_metre ? Math.min(100, Math.round((toplam / p.hedef_metre) * 100)) : 0;
+      return `<div class="card proj-card"><div class="name">🏗 ${p.ad}</div>
+        <div class="progress-label"><span>${toplam.toLocaleString('tr-TR')} m ${p.konum ? '· ' + p.konum : ''}</span><span>${p.hedef_metre ? '%' + yuzde : ''}</span></div>
+        ${p.hedef_metre ? `<div class="progress-bar"><div class="progress-fill" style="width:${yuzde}%"></div></div>` : ''}</div>`;
+    }).join('') || `<div class="readonly-notice">Henüz aktif proje yok. "Projeler" sekmesinden ekleyebilirsin.</div>`;
+    c.innerHTML = `
+      <div class="card"><h3>Hoş geldin, ${currentUser.ad_soyad.split(' ')[0]}</h3>
+        <div class="muted" style="font-size:12px;">${rolEtiketleri[currentUser.rol]} · ${currentFirma.ad}</div></div>
+      ${currentFirma.plan_durumu === 'deneme' ? `<div class="trial-badge">⏳ Deneme sürümünde ${kalanGun} gün kaldı</div>` : ''}
+      ${projeKarti}`;
+  }
+
+  function renderKayit() {
+    const c = document.getElementById('container');
+    if (!yazabilir()) { c.innerHTML = `<div class="readonly-notice">🔒 "Sadece Rapor" rolündesin, kayıt ekleyemezsin.</div>`; return; }
+    const projOpts = lookups.projeler.filter(p => p.durum === 'aktif').map(p => `<option value="${p.id}">${p.ad}</option>`).join('');
+    const ekipOpts = lookups.ekipler.map(e => `<option value="${e.id}">${e.ad}</option>`).join('');
+    const denOpts = `<option value="">— Denetimci yok —</option>` + lookups.denetimciler.map(d => `<option value="${d.id}">${d.ad}${d.kurum ? ' (' + d.kurum + ')' : ''}</option>`).join('');
+    const malOpts = `<option value="">—</option>` + lookups.malzeme_turleri.map(m => `<option value="${m.id}">${m.ad}</option>`).join('');
+    c.innerHTML = `<div class="card"><h3>Yeni Kazı Kaydı</h3><div id="kayitMsg"></div>
+      <div class="field"><label>Proje</label><select id="kProje">${projOpts || '<option value="">Önce proje ekle</option>'}</select></div>
+      <div class="field-row">
+        <div class="field"><label>Tarih</label><input type="date" id="kTarih" value="${new Date().toISOString().slice(0,10)}"></div>
+        <div class="field"><label>Metraj (m)</label><input type="number" id="kMetraj" step="0.1" placeholder="0"></div>
+      </div>
+      <div class="field"><label>Ekip</label><select id="kEkip">${ekipOpts || '<option value="">Önce ekip ekle</option>'}</select></div>
+      <div class="field"><label>Denetimci</label><select id="kDenetimci">${denOpts}</select></div>
+      <div class="field"><label>Malzeme Türü</label><select id="kMalzeme">${malOpts}</select></div>
+      <div class="field"><label>Notlar</label><textarea id="kNotlar" rows="2" placeholder="Varsa hata/uyarı notu"></textarea></div>
+      <button class="btn full" onclick="kayitKaydet()">Kaydı Ekle</button></div>`;
+  }
+
+  async function kayitKaydet() {
+    const msg = document.getElementById('kayitMsg');
+    const proje_id = document.getElementById('kProje').value;
+    const metraj = document.getElementById('kMetraj').value;
+    if (!proje_id || !metraj) { toast(msg, 'Proje ve metraj zorunlu.', false); return; }
+    const { error } = await sb.from('kayitlar').insert({
+      firma_id: currentUser.firma_id, proje_id,
+      tarih: document.getElementById('kTarih').value,
+      metraj: Number(metraj),
+      ekip_id: document.getElementById('kEkip').value || null,
+      denetimci_id: document.getElementById('kDenetimci').value || null,
+      malzeme_turu_id: document.getElementById('kMalzeme').value || null,
+      notlar: document.getElementById('kNotlar').value || null,
+      olusturan_kullanici_id: currentUser.id
+    });
+    if (error) { toast(msg, 'Hata: ' + error.message, false); return; }
+    toast(msg, '✅ Kayıt eklendi.', true);
+    document.getElementById('kMetraj').value = '';
+    document.getElementById('kNotlar').value = '';
+  }
+
+  function renderProjeler() {
+    const c = document.getElementById('container');
+    const liste = lookups.projeler.map(p => `<div class="list-row">
+        <div><b>${p.ad}</b>${p.konum ? ' <span class="muted">· ' + p.konum + '</span>' : ''}${p.hedef_metre ? ' <span class="muted">· hedef ' + p.hedef_metre + ' m</span>' : ''}</div>
+        ${yazabilir() ? `<span class="del" onclick="projeSil('${p.id}')">Sil</span>` : ''}</div>`).join('') || `<div class="muted">Henüz proje yok.</div>`;
+    c.innerHTML = `<div class="card"><h3>Projeler</h3><div id="projMsg"></div>${liste}</div>
+      ${yazabilir() ? `<div class="card"><h3>Yeni Proje</h3>
+        <div class="field"><label>Proje Adı</label><input id="pAd" placeholder="Silivri Öbek 4. Etap"></div>
+        <div class="field-row">
+          <div class="field"><label>Konum</label><input id="pKonum" placeholder="İstanbul"></div>
+          <div class="field"><label>Hedef Metraj</label><input type="number" id="pHedef" placeholder="16000"></div>
+        </div>
+        <button class="btn full" onclick="projeEkle()">Projeyi Ekle</button></div>` : ''}`;
+  }
+
+  async function projeEkle() {
+    const msg = document.getElementById('projMsg');
+    const ad = document.getElementById('pAd').value.trim();
+    if (!ad) { toast(msg, 'Proje adı gerekli.', false); return; }
+    const { error } = await sb.from('projeler').insert({
+      firma_id: currentUser.firma_id, ad,
+      konum: document.getElementById('pKonum').value || null,
+      hedef_metre: document.getElementById('pHedef').value || null
+    });
+    if (error) { toast(msg, 'Hata: ' + error.message, false); return; }
+    await loadLookups(); renderProjeler();
+    toast(document.getElementById('projMsg'), '✅ Proje eklendi.', true);
+  }
+
+  async function projeSil(id) {
+    await sb.from('projeler').update({ durum: 'silindi' }).eq('id', id);
+    await loadLookups(); renderProjeler();
+  }
+
+  async function renderGiderler() {
+    const c = document.getElementById('container');
+    c.innerHTML = `<div class="state-box">Yükleniyor...</div>`;
+    const { data: giderler } = await sb.from('giderler').select('id, tarih, tutar, aciklama, kategori_id').order('tarih', { ascending: false }).limit(30);
+    const liste = (giderler || []).map(g => `<div class="list-row">
+        <div>${g.tarih} · <span class="muted">${isim(lookups.gider_kategorileri, g.kategori_id)}</span>${g.aciklama ? ' · ' + g.aciklama : ''}</div>
+        <b class="mono">₺${Number(g.tutar).toLocaleString('tr-TR')}</b></div>`).join('') || `<div class="muted">Henüz gider yok.</div>`;
+    const katOpts = lookups.gider_kategorileri.map(k => `<option value="${k.id}">${k.ad}</option>`).join('');
+    const projOpts = `<option value="">—</option>` + lookups.projeler.map(p => `<option value="${p.id}">${p.ad}</option>`).join('');
+    c.innerHTML = `<div class="card"><h3>Giderler</h3><div id="giderMsg"></div>${liste}</div>
+      ${yazabilir() ? `<div class="card"><h3>Yeni Gider</h3>
+        <div class="field-row">
+          <div class="field"><label>Tarih</label><input type="date" id="gTarih" value="${new Date().toISOString().slice(0,10)}"></div>
+          <div class="field"><label>Tutar (₺)</label><input type="number" id="gTutar" placeholder="0"></div>
+        </div>
+        <div class="field"><label>Kategori</label><select id="gKategori">${katOpts || '<option value="">Önce kategori ekle</option>'}</select></div>
+        <div class="field"><label>Proje (opsiyonel)</label><select id="gProje">${projOpts}</select></div>
+        <div class="field"><label>Açıklama</label><input id="gAciklama" placeholder="Not"></div>
+        <button class="btn full" onclick="giderEkle()">Gideri Ekle</button></div>` : `<div class="readonly-notice">🔒 "Sadece Rapor" rolündesin, gider ekleyemezsin.</div>`}`;
+  }
+
+  async function giderEkle() {
+    const msg = document.getElementById('giderMsg');
+    const tutar = document.getElementById('gTutar').value;
+    const kategori_id = document.getElementById('gKategori').value;
+    if (!tutar || !kategori_id) { toast(msg, 'Tutar ve kategori zorunlu.', false); return; }
+    const { error } = await sb.from('giderler').insert({
+      firma_id: currentUser.firma_id,
+      tarih: document.getElementById('gTarih').value,
+      tutar: Number(tutar), kategori_id,
+      proje_id: document.getElementById('gProje').value || null,
+      aciklama: document.getElementById('gAciklama').value || null
+    });
+    if (error) { toast(msg, 'Hata: ' + error.message, false); return; }
+    renderGiderler();
+  }
+
+  const referansTablolar = {
+    ekipler: { tablo: 'ekipler', baslik: 'Ekipler', placeholder: 'Ekip adı' },
+    denetimciler: { tablo: 'denetimciler', baslik: 'Denetimciler', placeholder: 'Denetimci adı' },
+    malzeme_turleri: { tablo: 'malzeme_turleri', baslik: 'Malzeme Türleri', placeholder: 'Malzeme türü' },
+    gider_kategorileri: { tablo: 'gider_kategorileri', baslik: 'Gider Kategorileri', placeholder: 'Kategori adı' }
+  };
+
+  function renderYonetim() {
+    const c = document.getElementById('container');
+    const tabs = Object.keys(referansTablolar).map(k =>
+      `<div class="subtab ${yonetimTab===k?'on':''}" onclick="yonetimSekme('${k}')">${referansTablolar[k].baslik}</div>`
+    ).join('') + (currentUser.rol === 'yonetici' ? `<div class="subtab ${yonetimTab==='kullanicilar'?'on':''}" onclick="yonetimSekme('kullanicilar')">Kullanıcılar</div>` : '');
+    c.innerHTML = `<div class="tabs">${tabs}</div><div id="yonetimIcerik"></div>`;
+    if (yonetimTab === 'kullanicilar') renderKullanicilar(); else renderReferansListe(yonetimTab);
+  }
+
+  function yonetimSekme(k) { yonetimTab = k; renderYonetim(); }
+
+  function renderReferansListe(anahtar) {
+    const conf = referansTablolar[anahtar];
+    const veriler = lookups[anahtar];
+    const liste = veriler.map(v => `<div class="list-row">
+        <div>${v.ad}${v.kurum ? ' <span class="muted">· ' + v.kurum + '</span>' : ''}</div>
+        <span class="del" onclick="referansSil('${anahtar}', '${v.id}')">Sil</span></div>`).join('') || `<div class="muted">Henüz eklenmedi.</div>`;
+    document.getElementById('yonetimIcerik').innerHTML = `<div class="card"><h3>${conf.baslik}</h3><div id="refMsg"></div>${liste}</div>
+      <div class="card"><div class="field"><input id="refAd" placeholder="${conf.placeholder}"></div>
+        ${anahtar === 'denetimciler' ? `<div class="field"><input id="refKurum" placeholder="Kurum (opsiyonel, örn. Mikrolink)"></div>` : ''}
+        <button class="btn full" onclick="referansEkle('${anahtar}')">Ekle</button></div>`;
+  }
+
+  async function referansEkle(anahtar) {
+    const conf = referansTablolar[anahtar];
+    const ad = document.getElementById('refAd').value.trim();
+    const msg = document.getElementById('refMsg');
+    if (!ad) { toast(msg, 'Ad gerekli.', false); return; }
+    const kayit = { firma_id: currentUser.firma_id, ad };
+    if (anahtar === 'denetimciler') kayit.kurum = document.getElementById('refKurum').value || null;
+    const { error } = await sb.from(conf.tablo).insert(kayit);
+    if (error) { toast(msg, 'Hata: ' + error.message, false); return; }
+    await loadLookups(); renderReferansListe(anahtar);
+  }
+
+  async function referansSil(anahtar, id) {
+    await sb.from(referansTablolar[anahtar].tablo).delete().eq('id', id);
+    await loadLookups(); renderReferansListe(anahtar);
+  }
+
+  async function renderKullanicilar() {
+    const el = document.getElementById('yonetimIcerik');
+    el.innerHTML = `<div class="state-box">Yükleniyor...</div>`;
+    const { data: kullanicilar } = await sb.from('kullanicilar').select('ad_soyad, email, rol, durum').order('ad_soyad');
+    const liste = (kullanicilar || []).map(k => `<div class="list-row">
+        <div>${k.ad_soyad} <span class="muted">· ${k.email}</span></div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="${k.durum==='aktif'?'status-active':'status-pending'}">${k.durum==='aktif'?'●':'○'}</span>
+          <span class="role-pill role-${k.rol}">${rolEtiketleri[k.rol]}</span>
+        </div></div>`).join('');
+    el.innerHTML = `<div class="card"><h3>Kullanıcılar</h3><div id="davetMsg"></div>${liste}</div>
+      <div class="card"><h3>Kullanıcı Davet Et</h3>
+        <div class="field"><label>Ad Soyad</label><input id="dAdSoyad" placeholder="Burak Durak"></div>
+        <div class="field"><label>E-posta</label><input id="dEmail" type="email" placeholder="burak@firmam.com"></div>
+        <div class="field"><label>Rol</label><select id="dRol">
+            <option value="saha_personeli">Saha Personeli</option>
+            <option value="sadece_rapor">Sadece Rapor</option>
+            <option value="yonetici">Yönetici</option>
+          </select></div>
+        <button class="btn full" id="davetBtn" onclick="kullaniciDavetEt()">Davet Gönder</button></div>`;
+  }
+
+  async function kullaniciDavetEt() {
+    const msg = document.getElementById('davetMsg');
+    const ad_soyad = document.getElementById('dAdSoyad').value.trim();
+    const email = document.getElementById('dEmail').value.trim();
+    const rol = document.getElementById('dRol').value;
+    if (!ad_soyad || !email) { toast(msg, 'Ad soyad ve e-posta gerekli.', false); return; }
+    const btn = document.getElementById('davetBtn');
+    btn.disabled = true; btn.textContent = 'Gönderiliyor...';
+    const { data, error } = await sb.functions.invoke('davet-et', { body: { ad_soyad, email, rol } });
+    btn.disabled = false; btn.textContent = 'Davet Gönder';
+    if (error || (data && data.error)) { toast(msg, 'Hata: ' + ((data && data.error) || error.message), false); return; }
+    toast(msg, '✅ Davet e-postası gönderildi: ' + email, true);
+    renderKullanicilar();
   }
 
   init();
