@@ -45,6 +45,41 @@
   .progress-bar { height: 7px; background: var(--bg); border-radius: 5px; overflow: hidden; margin: 6px 0; }
   .progress-fill { height: 100%; background: var(--blue); }
   .progress-label { display: flex; justify-content: space-between; font-size: 10.5px; color: var(--muted2); }
+
+  /* PROJE KARTLARI — "Saha Etiketi" tasarımı (Kazı Takip'ten) */
+  .scard { position: relative; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 13px 14px 12px; overflow: hidden; margin-bottom: 12px; }
+  .scard.aktif { border-color: rgba(245,158,11,0.55); box-shadow: inset 3px 0 0 var(--yellow); }
+  .scard.tamam { border-color: rgba(34,197,94,0.3); }
+  .scard-top { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .scard-kod { font-family: ui-monospace, 'SF Mono', 'Roboto Mono', monospace; font-size: 10px; color: var(--muted2); border: 1px solid var(--line); border-radius: 4px; padding: 2px 6px; letter-spacing: 1px; flex-shrink: 0; }
+  .scard-durum { font-size: 9.5px; font-weight: 800; letter-spacing: .5px; color: var(--muted); white-space: nowrap; margin-left: auto; }
+  .scard-durum.canli { color: var(--yellow); display: flex; align-items: center; gap: 5px; }
+  .scard-durum.tamam-rozet { background: rgba(34,197,94,0.15); color: #4ade80; border: 1px solid rgba(34,197,94,0.4); border-radius: 20px; padding: 3px 9px; }
+  .scard-durum.canli .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--yellow); flex-shrink: 0; animation: scard-pulse 1.6s infinite; }
+  @keyframes scard-pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(245,158,11,.55); }
+    70%  { box-shadow: 0 0 0 6px rgba(245,158,11,0); }
+    100% { box-shadow: 0 0 0 0 rgba(245,158,11,0); }
+  }
+  .scard-isim { margin-top: 8px; font-size: 14px; font-weight: 800; letter-spacing: .3px; text-transform: uppercase; color: #f1f5f9; line-height: 1.25; }
+  .scard.aktif .scard-isim { color: var(--yellow); }
+  .scard-konum { margin-top: 3px; font-size: 11px; color: var(--muted2); }
+  .scard-divider { border-top: 1px dashed var(--line); margin: 9px 0 8px; }
+  .scard-ruler { position: relative; height: 8px; border-radius: 2px; background: rgba(148,163,184,.12); background-image: repeating-linear-gradient(90deg, rgba(148,163,184,.4) 0 1px, transparent 1px 8px); overflow: hidden; }
+  .scard-ruler-fill { position: absolute; inset: 0; width: 0%; border-radius: 2px 0 0 2px; background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+  .scard.tamam .scard-ruler-fill { background: linear-gradient(90deg, #22c55e, #4ade80); }
+  .scard-ruler-labels { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; font-family: ui-monospace, 'SF Mono', 'Roboto Mono', monospace; font-size: 10px; color: var(--muted); }
+  .scard-ruler-pct { color: #f1f5f9; font-weight: 700; }
+  .scard-meta { font-family: ui-monospace, 'SF Mono', 'Roboto Mono', monospace; font-size: 10.5px; color: var(--muted2); }
+  .scard-icobtn { flex-shrink: 0; width: 25px; height: 25px; border-radius: 6px; border: 1px solid var(--line); background: none; color: var(--muted2); font-size: 12px; cursor: pointer; font-family: inherit; display: flex; align-items: center; justify-content: center; padding: 0; }
+  .scard-icobtn.tamamla { border-color: rgba(34,197,94,.4); color: #4ade80; }
+  .scard-icobtn.ac { border-color: var(--line); color: var(--muted2); }
+  .scard-icobtn.sil { border-color: rgba(239,68,68,.35); color: var(--red); }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.6); display: flex; align-items: center; justify-content: center; z-index: 50; padding: 20px; }
+  .modal-box { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 22px; text-align: center; max-width: 300px; }
+  .modal-box h3 { font-size: 14px; margin: 0 0 14px; }
+  .modal-box .qr-wrap { background: #fff; padding: 12px; border-radius: 10px; display: inline-block; }
+  .modal-box .btn { margin-top: 16px; }
   .tabs { display: flex; gap: 6px; margin-bottom: 14px; overflow-x: auto; }
   .subtab { flex-shrink: 0; padding: 8px 13px; border-radius: 8px; font-size: 11.5px; font-weight: 700; background: var(--card2); color: var(--muted2); cursor: pointer; }
   .subtab.on { background: var(--yellow); color: #1e293b; }
@@ -85,30 +120,64 @@
     <button class="nav-btn" id="nav-giderler" onclick="gitView('giderler')"><span class="ic">💸</span><span>Giderler</span></button>
     <button class="nav-btn" id="nav-yonetim" onclick="gitView('yonetim')"><span class="ic">⚙️</span><span>Yönetim</span></button>
   </nav>
+  <div class="modal-overlay" id="qrModal" style="display:none" onclick="if(event.target===this) qrKapat()">
+    <div class="modal-box">
+      <h3 id="qrBaslik">Proje QR Kodu</h3>
+      <div class="qr-wrap" id="qrCanvas"></div>
+      <button class="btn" onclick="qrKapat()">Kapat</button>
+    </div>
+  </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="common.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
+  const SUPABASE_URL = 'https://wqqdcowrtlvfruvsmtew.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_bfPBnm138vlmJa_z4Pi95w_EsYw2zkB';
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const ROL_ETIKETLERI = { yonetici: 'Yönetici', saha_personeli: 'Saha Personeli', sadece_rapor: 'Sadece Rapor' };
+  const PLAN_ETIKETLERI = { deneme: 'Deneme Sürümü', aktif: 'Aktif', gecikmis: 'Gecikmiş Ödeme', iptal: 'İptal Edildi' };
+  const KULLANICI_BASI_FIYAT = 149;
+  async function ortakOturumKontrol(girisSayfasi) {
+    girisSayfasi = girisSayfasi || 'index.html';
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) { window.location.href = girisSayfasi; return null; }
+    return session;
+  }
+  async function ortakProfilYukle(userId) {
+    return await sb.from('kullanicilar').select('id, ad_soyad, email, rol, firma_id, firmalar ( ad, plan_durumu, deneme_bitis_tarihi )').eq('id', userId).single();
+  }
+  async function ortakCikisYap(girisSayfasi) {
+    girisSayfasi = girisSayfasi || 'index.html';
+    await sb.auth.signOut();
+    window.location.href = girisSayfasi;
+  }
   let currentUser = null;
   let currentFirma = null;
   let lookups = { projeler: [], ekipler: [], denetimciler: [], malzeme_turleri: [], gider_kategorileri: [] };
   let yonetimTab = 'ekipler';
+  let editingKayitId = null;
+  let secilenFoto = null;
   const yazabilir = () => currentUser && currentUser.rol !== 'sadece_rapor';
   const isim = (arr, id) => (arr.find(x => x.id === id) || {}).ad || '—';
 
   async function init() {
-    const session = await ortakOturumKontrol('index.html');
-    if (!session) return;
-    const { data: profil, error } = await ortakProfilYukle(session.user.id);
-    if (error || !profil) {
-      document.getElementById('container').innerHTML = `<div class="err-box">Profil alınamadı: ${(error && error.message) || 'bilinmiyor'}</div>`;
-      return;
+    try {
+      const session = await ortakOturumKontrol('index.html');
+      if (!session) return;
+      const { data: profil, error } = await ortakProfilYukle(session.user.id);
+      if (error || !profil) {
+        document.getElementById('container').innerHTML = `<div class="err-box">Profil alınamadı: ${(error && error.message) || 'bilinmiyor'}</div>`;
+        return;
+      }
+      currentUser = { id: profil.id, firma_id: profil.firma_id, rol: profil.rol, ad_soyad: profil.ad_soyad, email: profil.email };
+      currentFirma = profil.firmalar;
+      document.getElementById('firmaAdiHeader').textContent = currentFirma.ad;
+      document.getElementById('bottomNav').style.display = 'flex';
+      await loadLookups();
+      gitView('dashboard');
+    } catch (e) {
+      document.getElementById('container').innerHTML = `<div class="err-box">Bir hata oluştu: ${e.message || e}<br><br><button class="btn" onclick="location.reload()">Yeniden Dene</button></div>`;
+      console.error('init() hatası:', e);
     }
-    currentUser = { id: profil.id, firma_id: profil.firma_id, rol: profil.rol, ad_soyad: profil.ad_soyad, email: profil.email };
-    currentFirma = profil.firmalar;
-    document.getElementById('firmaAdiHeader').textContent = currentFirma.ad;
-    document.getElementById('bottomNav').style.display = 'flex';
-    await loadLookups();
-    gitView('dashboard');
   }
 
   async function loadLookups() {
@@ -145,12 +214,26 @@
     c.innerHTML = `<div class="state-box">Yükleniyor...</div>`;
     const kalanGun = Math.max(0, Math.ceil((new Date(currentFirma.deneme_bitis_tarihi) - new Date()) / 86400000));
     const { data: kayitlar } = await sb.from('kayitlar').select('proje_id, metraj');
-    const projeKarti = lookups.projeler.filter(p => p.durum === 'aktif').map(p => {
+    const aktifProjeler = lookups.projeler.filter(p => p.durum === 'aktif' || p.durum === 'bitti');
+    const projeKarti = aktifProjeler.map((p, i) => {
       const toplam = (kayitlar || []).filter(k => k.proje_id === p.id).reduce((s, k) => s + Number(k.metraj), 0);
       const yuzde = p.hedef_metre ? Math.min(100, Math.round((toplam / p.hedef_metre) * 100)) : 0;
-      return `<div class="card proj-card"><div class="name">🏗 ${p.ad}</div>
-        <div class="progress-label"><span>${toplam.toLocaleString('tr-TR')} m ${p.konum ? '· ' + p.konum : ''}</span><span>${p.hedef_metre ? '%' + yuzde : ''}</span></div>
-        ${p.hedef_metre ? `<div class="progress-bar"><div class="progress-fill" style="width:${yuzde}%"></div></div>` : ''}</div>`;
+      const tamam = p.durum === 'bitti';
+      const kod = 'P-' + String(i + 1).padStart(2, '0');
+      const durumHtml = tamam
+        ? `<span class="scard-durum tamam-rozet">✓ TAMAMLANDI</span>`
+        : `<span class="scard-durum canli"><span class="dot"></span>SAHADA</span>`;
+      const ruler = p.hedef_metre
+        ? `<div class="scard-divider"></div>
+           <div class="scard-ruler"><div class="scard-ruler-fill" style="width:${yuzde}%"></div></div>
+           <div class="scard-ruler-labels"><span>0m</span><span class="scard-ruler-pct">%${yuzde}</span><span>${Number(p.hedef_metre).toLocaleString('tr-TR')}m</span></div>`
+        : `<div class="scard-divider"></div><div class="scard-meta">${toplam.toLocaleString('tr-TR')} m toplam</div>`;
+      return `<div class="scard ${tamam ? 'tamam' : 'aktif'}">
+          <div class="scard-top"><span class="scard-kod">${kod}</span>${durumHtml}</div>
+          <div class="scard-isim">🏗 ${p.ad}</div>
+          ${p.konum ? `<div class="scard-konum">📍 ${p.konum}</div>` : ''}
+          ${ruler}
+        </div>`;
     }).join('') || `<div class="readonly-notice">Henüz aktif proje yok. "Projeler" sekmesinden ekleyebilirsin.</div>`;
     c.innerHTML = `
       <div class="card"><h3>Hoş geldin, ${currentUser.ad_soyad.split(' ')[0]}</h3>
@@ -161,12 +244,13 @@
 
   function renderKayit() {
     const c = document.getElementById('container');
-    if (!yazabilir()) { c.innerHTML = `<div class="readonly-notice">🔒 "Sadece Rapor" rolündesin, kayıt ekleyemezsin.</div>`; return; }
+    if (!yazabilir()) { c.innerHTML = `<div class="readonly-notice">🔒 "Sadece Rapor" rolündesin, kayıt ekleyemezsin.</div><div id="kayitListesi"></div>`; kayitlariListele(); return; }
+    editingKayitId = null; secilenFoto = null;
     const projOpts = lookups.projeler.filter(p => p.durum === 'aktif').map(p => `<option value="${p.id}">${p.ad}</option>`).join('');
     const ekipOpts = lookups.ekipler.map(e => `<option value="${e.id}">${e.ad}</option>`).join('');
     const denOpts = `<option value="">— Denetimci yok —</option>` + lookups.denetimciler.map(d => `<option value="${d.id}">${d.ad}${d.kurum ? ' (' + d.kurum + ')' : ''}</option>`).join('');
     const malOpts = `<option value="">—</option>` + lookups.malzeme_turleri.map(m => `<option value="${m.id}">${m.ad}</option>`).join('');
-    c.innerHTML = `<div class="card"><h3>Yeni Kazı Kaydı</h3><div id="kayitMsg"></div>
+    c.innerHTML = `<div class="card" id="kayitFormCard"><h3 id="kayitFormBaslik">Yeni Kazı Kaydı</h3><div id="kayitMsg"></div>
       <div class="field"><label>Proje</label><select id="kProje">${projOpts || '<option value="">Önce proje ekle</option>'}</select></div>
       <div class="field-row">
         <div class="field"><label>Tarih</label><input type="date" id="kTarih" value="${new Date().toISOString().slice(0,10)}"></div>
@@ -176,7 +260,64 @@
       <div class="field"><label>Denetimci</label><select id="kDenetimci">${denOpts}</select></div>
       <div class="field"><label>Malzeme Türü</label><select id="kMalzeme">${malOpts}</select></div>
       <div class="field"><label>Notlar</label><textarea id="kNotlar" rows="2" placeholder="Varsa hata/uyarı notu"></textarea></div>
-      <button class="btn full" onclick="kayitKaydet()">Kaydı Ekle</button></div>`;
+      <div class="field"><label>Fotoğraf (opsiyonel)</label><input type="file" id="kFoto" accept="image/*" onchange="fotoSecildi(event)"></div>
+      <div id="kFotoOnizleme"></div>
+      <button class="btn full" id="kKaydetBtn" onclick="kayitKaydet()">Kaydı Ekle</button>
+      <button class="btn full" id="kIptalBtn" style="display:none;background:var(--card2);color:#e2e8f0;margin-top:6px;" onclick="renderKayit()">İptal</button>
+      </div>
+      <div id="kayitListesi"></div>`;
+    kayitlariListele();
+  }
+
+  function fotoSecildi(ev) {
+    secilenFoto = ev.target.files[0] || null;
+    const onizleme = document.getElementById('kFotoOnizleme');
+    onizleme.innerHTML = secilenFoto ? `<div class="muted" style="font-size:11px;margin:-4px 0 11px;">📎 ${secilenFoto.name}</div>` : '';
+  }
+
+  async function fotoYukle(kayitId) {
+    if (!secilenFoto) return null;
+    const uzanti = secilenFoto.name.split('.').pop();
+    const yol = `${currentUser.firma_id}/${kayitId}-${Date.now()}.${uzanti}`;
+    const { error } = await sb.storage.from('kayit-fotograflari').upload(yol, secilenFoto);
+    if (error) { console.error('Foto yükleme hatası:', error.message); return null; }
+    return yol;
+  }
+
+  async function kayitlariListele() {
+    const el = document.getElementById('kayitListesi');
+    const { data: son } = await sb.from('kayitlar')
+      .select('id, tarih, metraj, proje_id, ekip_id, notlar, fotograflar')
+      .order('tarih', { ascending: false }).limit(15);
+
+    const liste = (son || []).map(k => `
+      <div class="list-row" style="align-items:flex-start;">
+        <div>
+          <div><b>${isim(lookups.projeler, k.proje_id)}</b> <span class="muted mono">${k.tarih}</span></div>
+          <div class="muted" style="font-size:11px;margin-top:2px;">${isim(lookups.ekipler, k.ekip_id)}${k.notlar ? ' · ' + k.notlar : ''}${(k.fotograflar||[]).length ? ' · 📷 ' + k.fotograflar.length : ''}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+          <b class="mono">${Number(k.metraj).toLocaleString('tr-TR')} m</b>
+          ${yazabilir() ? `
+            <button class="scard-icobtn ac" onclick='kayitDuzenleAc(${JSON.stringify(k).replace(/'/g, "&apos;")})' title="Düzenle">✎</button>
+            <button class="scard-icobtn sil" onclick="kayitSil('${k.id}')" title="Sil">✕</button>` : ''}
+        </div>
+      </div>`).join('') || `<div class="muted">Henüz kayıt yok.</div>`;
+
+    el.innerHTML = `<div class="card"><h3>Son Kayıtlar</h3>${liste}</div>`;
+  }
+
+  function kayitDuzenleAc(k) {
+    editingKayitId = k.id;
+    document.getElementById('kayitFormBaslik').textContent = 'Kaydı Düzenle';
+    document.getElementById('kProje').value = k.proje_id;
+    document.getElementById('kTarih').value = k.tarih;
+    document.getElementById('kMetraj').value = k.metraj;
+    document.getElementById('kEkip').value = k.ekip_id || '';
+    document.getElementById('kNotlar').value = k.notlar || '';
+    document.getElementById('kKaydetBtn').textContent = 'Kaydı Güncelle';
+    document.getElementById('kIptalBtn').style.display = 'block';
+    document.getElementById('kayitFormCard').scrollIntoView({ behavior: 'smooth' });
   }
 
   async function kayitKaydet() {
@@ -184,28 +325,87 @@
     const proje_id = document.getElementById('kProje').value;
     const metraj = document.getElementById('kMetraj').value;
     if (!proje_id || !metraj) { toast(msg, 'Proje ve metraj zorunlu.', false); return; }
-    const { error } = await sb.from('kayitlar').insert({
-      firma_id: currentUser.firma_id, proje_id,
+
+    const btn = document.getElementById('kKaydetBtn');
+    btn.disabled = true;
+
+    const veri = {
+      proje_id,
       tarih: document.getElementById('kTarih').value,
       metraj: Number(metraj),
       ekip_id: document.getElementById('kEkip').value || null,
       denetimci_id: document.getElementById('kDenetimci').value || null,
       malzeme_turu_id: document.getElementById('kMalzeme').value || null,
       notlar: document.getElementById('kNotlar').value || null,
-      olusturan_kullanici_id: currentUser.id
-    });
+    };
+
+    if (editingKayitId) {
+      const { error } = await sb.from('kayitlar').update(veri).eq('id', editingKayitId);
+      btn.disabled = false;
+      if (error) { toast(msg, 'Hata: ' + error.message, false); return; }
+      if (secilenFoto) {
+        const yol = await fotoYukle(editingKayitId);
+        if (yol) {
+          const { data: mevcut } = await sb.from('kayitlar').select('fotograflar').eq('id', editingKayitId).single();
+          await sb.from('kayitlar').update({ fotograflar: [...(mevcut.fotograflar || []), yol] }).eq('id', editingKayitId);
+        }
+      }
+      toast(msg, '✅ Kayıt güncellendi.', true);
+      renderKayit();
+      return;
+    }
+
+    veri.firma_id = currentUser.firma_id;
+    veri.olusturan_kullanici_id = currentUser.id;
+    const { data: yeniKayit, error } = await sb.from('kayitlar').insert(veri).select('id').single();
+    btn.disabled = false;
     if (error) { toast(msg, 'Hata: ' + error.message, false); return; }
+
+    if (secilenFoto && yeniKayit) {
+      const yol = await fotoYukle(yeniKayit.id);
+      if (yol) await sb.from('kayitlar').update({ fotograflar: [yol] }).eq('id', yeniKayit.id);
+    }
+
     toast(msg, '✅ Kayıt eklendi.', true);
     document.getElementById('kMetraj').value = '';
     document.getElementById('kNotlar').value = '';
+    document.getElementById('kFoto').value = '';
+    document.getElementById('kFotoOnizleme').innerHTML = '';
+    secilenFoto = null;
+    kayitlariListele();
+  }
+
+  async function kayitSil(id) {
+    await sb.from('kayitlar').delete().eq('id', id);
+    kayitlariListele();
   }
 
   function renderProjeler() {
     const c = document.getElementById('container');
-    const liste = lookups.projeler.map(p => `<div class="list-row">
-        <div><b>${p.ad}</b>${p.konum ? ' <span class="muted">· ' + p.konum + '</span>' : ''}${p.hedef_metre ? ' <span class="muted">· hedef ' + p.hedef_metre + ' m</span>' : ''}</div>
-        ${yazabilir() ? `<span class="del" onclick="projeSil('${p.id}')">Sil</span>` : ''}</div>`).join('') || `<div class="muted">Henüz proje yok.</div>`;
-    c.innerHTML = `<div class="card"><h3>Projeler</h3><div id="projMsg"></div>${liste}</div>
+    const liste = lookups.projeler.map((p, i) => {
+      const tamam = p.durum === 'bitti';
+      const kod = 'P-' + String(i + 1).padStart(2, '0');
+      const durumHtml = tamam
+        ? `<span class="scard-durum tamam-rozet">✓ TAMAMLANDI</span>`
+        : `<span class="scard-durum canli"><span class="dot"></span>SAHADA</span>`;
+      const butonlar = `
+          <span class="scard-icobtn-group" style="margin-left:auto;display:flex;gap:6px;">
+            <button class="scard-icobtn ac" onclick="qrGoster('${p.id}', '${p.ad.replace(/'/g, "&apos;")}')" title="QR Kod">▦</button>
+            ${yazabilir() ? `
+              ${!tamam ? `<button class="scard-icobtn tamamla" onclick="projeTamamla('${p.id}')" title="Tamamla">✓</button>` : `<button class="scard-icobtn ac" onclick="projeYenidenAc('${p.id}')" title="Yeniden aç">↺</button>`}
+              <button class="scard-icobtn sil" onclick="projeSil('${p.id}')" title="Sil">✕</button>` : ''}
+          </span>`;
+      return `<div class="scard ${tamam ? 'tamam' : 'aktif'}">
+          <div class="scard-top"><span class="scard-kod">${kod}</span>${durumHtml}${butonlar}</div>
+          <div class="scard-isim">🏗 ${p.ad}</div>
+          ${p.konum ? `<div class="scard-konum">📍 ${p.konum}</div>` : ''}
+          ${p.hedef_metre ? `<div class="scard-meta" style="margin-top:6px;">Hedef: ${Number(p.hedef_metre).toLocaleString('tr-TR')} m</div>` : ''}
+        </div>`;
+    }).join('') || `<div class="muted">Henüz proje yok.</div>`;
+
+    c.innerHTML = `
+      <div id="projMsg"></div>
+      ${liste}
       ${yazabilir() ? `<div class="card"><h3>Yeni Proje</h3>
         <div class="field"><label>Proje Adı</label><input id="pAd" placeholder="Silivri Öbek 4. Etap"></div>
         <div class="field-row">
@@ -214,6 +414,28 @@
         </div>
         <button class="btn full" onclick="projeEkle()">Projeyi Ekle</button></div>` : ''}`;
   }
+
+  async function projeTamamla(id) {
+    await sb.from('projeler').update({ durum: 'bitti' }).eq('id', id);
+    await loadLookups(); renderProjeler();
+  }
+
+  async function projeYenidenAc(id) {
+    await sb.from('projeler').update({ durum: 'aktif' }).eq('id', id);
+    await loadLookups(); renderProjeler();
+  }
+
+  function qrGoster(projeId, projeAdi) {
+    document.getElementById('qrBaslik').textContent = projeAdi;
+    const kutu = document.getElementById('qrCanvas');
+    kutu.innerHTML = '';
+    new QRCode(kutu, {
+      text: `KAZITAKIP|${currentFirma.ad}|${projeAdi}|${projeId}`,
+      width: 180, height: 180
+    });
+    document.getElementById('qrModal').style.display = 'flex';
+  }
+  function qrKapat() { document.getElementById('qrModal').style.display = 'none'; }
 
   async function projeEkle() {
     const msg = document.getElementById('projMsg');
@@ -240,7 +462,10 @@
     const { data: giderler } = await sb.from('giderler').select('id, tarih, tutar, aciklama, kategori_id').order('tarih', { ascending: false }).limit(30);
     const liste = (giderler || []).map(g => `<div class="list-row">
         <div>${g.tarih} · <span class="muted">${isim(lookups.gider_kategorileri, g.kategori_id)}</span>${g.aciklama ? ' · ' + g.aciklama : ''}</div>
-        <b class="mono">₺${Number(g.tutar).toLocaleString('tr-TR')}</b></div>`).join('') || `<div class="muted">Henüz gider yok.</div>`;
+        <div style="display:flex;align-items:center;gap:10px;">
+          <b class="mono">₺${Number(g.tutar).toLocaleString('tr-TR')}</b>
+          ${yazabilir() ? `<button class="scard-icobtn sil" onclick="giderSil('${g.id}')" title="Sil">✕</button>` : ''}
+        </div></div>`).join('') || `<div class="muted">Henüz gider yok.</div>`;
     const katOpts = lookups.gider_kategorileri.map(k => `<option value="${k.id}">${k.ad}</option>`).join('');
     const projOpts = `<option value="">—</option>` + lookups.projeler.map(p => `<option value="${p.id}">${p.ad}</option>`).join('');
     c.innerHTML = `<div class="card"><h3>Giderler</h3><div id="giderMsg"></div>${liste}</div>
@@ -253,6 +478,11 @@
         <div class="field"><label>Proje (opsiyonel)</label><select id="gProje">${projOpts}</select></div>
         <div class="field"><label>Açıklama</label><input id="gAciklama" placeholder="Not"></div>
         <button class="btn full" onclick="giderEkle()">Gideri Ekle</button></div>` : `<div class="readonly-notice">🔒 "Sadece Rapor" rolündesin, gider ekleyemezsin.</div>`}`;
+  }
+
+  async function giderSil(id) {
+    await sb.from('giderler').delete().eq('id', id);
+    renderGiderler();
   }
 
   async function giderEkle() {
@@ -294,7 +524,7 @@
     const veriler = lookups[anahtar];
     const liste = veriler.map(v => `<div class="list-row">
         <div>${v.ad}${v.kurum ? ' <span class="muted">· ' + v.kurum + '</span>' : ''}</div>
-        <span class="del" onclick="referansSil('${anahtar}', '${v.id}')">Sil</span></div>`).join('') || `<div class="muted">Henüz eklenmedi.</div>`;
+        <button class="scard-icobtn sil" onclick="referansSil('${anahtar}', '${v.id}')" title="Sil">✕</button></div>`).join('') || `<div class="muted">Henüz eklenmedi.</div>`;
     document.getElementById('yonetimIcerik').innerHTML = `<div class="card"><h3>${conf.baslik}</h3><div id="refMsg"></div>${liste}</div>
       <div class="card"><div class="field"><input id="refAd" placeholder="${conf.placeholder}"></div>
         ${anahtar === 'denetimciler' ? `<div class="field"><input id="refKurum" placeholder="Kurum (opsiyonel, örn. Mikrolink)"></div>` : ''}

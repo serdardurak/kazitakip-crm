@@ -32,6 +32,8 @@
   .plan-aktif { background: rgba(34,197,94,0.14); color: #86efac; }
   .plan-gecikmis, .plan-iptal { background: rgba(239,68,68,0.14); color: #fca5a5; }
   .denied { text-align: center; padding: 100px 20px; color: var(--muted2); }
+  .plan-select { background: var(--bg); border: 1px solid var(--line); color: #e2e8f0; border-radius: 7px; padding: 5px 7px; font-size: 11px; margin-right: 6px; }
+  .del-btn { background: none; border: 1px solid rgba(239,68,68,.35); color: var(--red); border-radius: 6px; width: 26px; height: 26px; cursor: pointer; font-size: 11px; }
 </style>
 </head>
 <body>
@@ -44,8 +46,27 @@
   </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="common.js"></script>
 <script>
+  const SUPABASE_URL = 'https://wqqdcowrtlvfruvsmtew.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_bfPBnm138vlmJa_z4Pi95w_EsYw2zkB';
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const ROL_ETIKETLERI = { yonetici: 'Yönetici', saha_personeli: 'Saha Personeli', sadece_rapor: 'Sadece Rapor' };
+  const PLAN_ETIKETLERI = { deneme: 'Deneme Sürümü', aktif: 'Aktif', gecikmis: 'Gecikmiş Ödeme', iptal: 'İptal Edildi' };
+  const KULLANICI_BASI_FIYAT = 149;
+  async function ortakOturumKontrol(girisSayfasi) {
+    girisSayfasi = girisSayfasi || 'index.html';
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) { window.location.href = girisSayfasi; return null; }
+    return session;
+  }
+  async function ortakProfilYukle(userId) {
+    return await sb.from('kullanicilar').select('id, ad_soyad, email, rol, firma_id, firmalar ( ad, plan_durumu, deneme_bitis_tarihi )').eq('id', userId).single();
+  }
+  async function ortakCikisYap(girisSayfasi) {
+    girisSayfasi = girisSayfasi || 'index.html';
+    await sb.auth.signOut();
+    window.location.href = girisSayfasi;
+  }
   async function init() {
     const session = await ortakOturumKontrol('index.html');
     if (!session) return;
@@ -78,6 +99,15 @@
         <td>${kullaniciSayisi[f.id] || 0}</td>
         <td><span class="plan-badge plan-${f.plan_durumu}">${PLAN_ETIKETLERI[f.plan_durumu]}${f.plan_durumu === 'deneme' ? ' · ' + Math.max(0, Math.ceil((new Date(f.deneme_bitis_tarihi) - new Date()) / 86400000)) + ' gün' : ''}</span></td>
         <td class="mono" style="color:var(--muted2);">${new Date(f.olusturulma_tarihi).toLocaleDateString('tr-TR')}</td>
+        <td>
+          <select class="plan-select" onchange="planDegistir('${f.id}', this.value)">
+            <option value="deneme" ${f.plan_durumu==='deneme'?'selected':''}>Deneme</option>
+            <option value="aktif" ${f.plan_durumu==='aktif'?'selected':''}>Aktif</option>
+            <option value="gecikmis" ${f.plan_durumu==='gecikmis'?'selected':''}>Gecikmiş</option>
+            <option value="iptal" ${f.plan_durumu==='iptal'?'selected':''}>İptal</option>
+          </select>
+          <button class="del-btn" onclick="firmaSil('${f.id}', '${f.ad.replace(/'/g, "&apos;")}')" title="Firmayı sil">✕</button>
+        </td>
       </tr>`).join('');
 
     c.innerHTML = `
@@ -88,10 +118,23 @@
         <div class="kpi"><div class="v">${toplamKullanici}</div><div class="l">Toplam Kullanıcı</div></div>
       </div>
       <table>
-        <tr><th>Firma</th><th>Kullanıcı</th><th>Plan</th><th>Kayıt Tarihi</th></tr>
-        ${satirlar || '<tr><td colspan="4" style="color:var(--muted2);">Henüz firma yok.</td></tr>'}
+        <tr><th>Firma</th><th>Kullanıcı</th><th>Plan</th><th>Kayıt Tarihi</th><th>Yönet</th></tr>
+        ${satirlar || '<tr><td colspan="5" style="color:var(--muted2);">Henüz firma yok.</td></tr>'}
       </table>
     `;
+  }
+
+  async function planDegistir(firmaId, yeniPlan) {
+    const { error } = await sb.from('firmalar').update({ plan_durumu: yeniPlan }).eq('id', firmaId);
+    if (error) { alert('Hata: ' + error.message); }
+    init();
+  }
+
+  async function firmaSil(firmaId, firmaAdi) {
+    if (!confirm(`"${firmaAdi}" firmasını ve TÜM verilerini kalıcı olarak silmek istediğine emin misin? Bu geri alınamaz.`)) return;
+    const { error } = await sb.from('firmalar').delete().eq('id', firmaId);
+    if (error) { alert('Hata: ' + error.message); return; }
+    init();
   }
 
   init();
