@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kazı Takip — Abonelik</title>
+<style>
+  :root {
+    --bg: #0f172a; --card: #1e293b; --card2: #263349;
+    --yellow: #f59e0b; --yellow-light: #fcd34d;
+    --muted: #64748b; --muted2: #94a3b8;
+    --green: #22c55e; --red: #ef4444; --line: #334155;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; background: var(--bg); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #e2e8f0; }
+  .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  .header { background: var(--card); border-bottom: 2px solid var(--yellow); padding: 12px 16px; display: flex; align-items: center; gap: 10px; }
+  .back { color: var(--muted2); font-size: 13px; text-decoration: none; font-weight: 700; }
+  .header h1 { font-size: 14px; margin: 0; }
+  .container { max-width: 480px; margin: 0 auto; padding: 16px; }
+  .state-box { text-align: center; padding: 60px 20px; color: var(--muted2); font-size: 13px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 13px; padding: 16px; margin-bottom: 12px; }
+  .trial-card { background: linear-gradient(135deg, rgba(245,158,11,0.12), rgba(245,158,11,0.02)); border: 1px solid rgba(245,158,11,0.3); }
+  .trial-card .lbl { font-size: 11px; color: var(--muted2); margin-bottom: 4px; }
+  .trial-card .days { font-size: 28px; font-weight: 900; color: var(--yellow); font-family: ui-monospace, monospace; }
+  .row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #1c2940; font-size: 13px; }
+  .row:last-child { border-bottom: none; }
+  .row .v { font-weight: 700; font-family: ui-monospace, monospace; }
+  .total-row { display: flex; justify-content: space-between; padding-top: 12px; font-size: 15px; font-weight: 800; }
+  .btn { width: 100%; border: none; border-radius: 10px; font-weight: 800; font-size: 13px; padding: 12px; cursor: pointer; background: linear-gradient(150deg, var(--yellow-light), var(--yellow)); color: #1e293b; margin-top: 10px; }
+  .btn:disabled { opacity: 0.5; cursor: default; }
+  .notice { background: var(--card2); border: 1px dashed var(--line); border-radius: 10px; padding: 12px; font-size: 11.5px; color: var(--muted2); margin-top: 10px; line-height: 1.5; }
+  .status-active { color: #86efac; }
+  .status-trial { color: var(--yellow-light); }
+  .status-late { color: #fca5a5; }
+</style>
+</head>
+<body>
+  <div class="header">
+    <a class="back" href="app.html">← Panel</a>
+    <h1>Abonelik</h1>
+  </div>
+  <div class="container" id="container">
+    <div class="state-box">Yükleniyor...</div>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="common.js"></script>
+<script>
+  async function init() {
+    const session = await ortakOturumKontrol('index.html');
+    if (!session) return;
+
+    const { data: profil, error } = await ortakProfilYukle(session.user.id);
+    const c = document.getElementById('container');
+    if (error || !profil) { c.innerHTML = `<div class="state-box">Bilgi alınamadı.</div>`; return; }
+
+    const firma = profil.firmalar;
+    const { count: kullaniciSayisi } = await sb.from('kullanicilar').select('id', { count: 'exact', head: true });
+
+    const kalanGun = Math.max(0, Math.ceil((new Date(firma.deneme_bitis_tarihi) - new Date()) / 86400000));
+    const aylikToplam = (kullaniciSayisi || 1) * KULLANICI_BASI_FIYAT;
+
+    const durumSinifi = { deneme: 'status-trial', aktif: 'status-active', gecikmis: 'status-late', iptal: 'status-late' }[firma.plan_durumu];
+
+    c.innerHTML = `
+      ${firma.plan_durumu === 'deneme' ? `
+        <div class="card trial-card">
+          <div class="lbl">DENEME SÜRÜMÜ</div>
+          <div class="days">${kalanGun} gün</div>
+          <div class="lbl" style="margin-top:4px;">kaldı — sonra otomatik ücretli plana geçer</div>
+        </div>` : ''}
+
+      <div class="card">
+        <div class="row"><span>Firma</span><span class="v" style="font-family:inherit;">${firma.ad}</span></div>
+        <div class="row"><span>Plan Durumu</span><span class="v ${durumSinifi}" style="font-family:inherit;">${PLAN_ETIKETLERI[firma.plan_durumu]}</span></div>
+        <div class="row"><span>Aktif Kullanıcı</span><span class="v">${kullaniciSayisi || 1}</span></div>
+        <div class="row"><span>Kullanıcı Başı</span><span class="v">₺${KULLANICI_BASI_FIYAT}/ay</span></div>
+        <div class="total-row"><span>Aylık Toplam</span><span class="mono">₺${aylikToplam.toLocaleString('tr-TR')}</span></div>
+      </div>
+
+      <div class="card">
+        <div style="font-size:13px;font-weight:800;margin-bottom:4px;">Ödeme Yöntemi</div>
+        <div style="font-size:12px;color:var(--muted2);">Henüz kart eklenmedi.</div>
+        <button class="btn" id="odemeBtn" onclick="odemeBaslat()">iyzico ile Kart Ekle</button>
+        <div class="notice">
+          ⚠️ Bu buton şu an gösterim amaçlı — gerçek ödeme akışının çalışması için iyzico mağaza (API key/secret) bilgilerin gerekiyor. Onları edinip paylaştığında, bu sayfayı gerçek iyzico Checkout Form entegrasyonuna bağlarım.
+        </div>
+      </div>
+    `;
+  }
+
+  function odemeBaslat() {
+    alert('iyzico API bilgileri henüz tanımlanmadı. Bu adım, iyzico mağaza hesabı bilgilerin eklendiğinde aktif hale gelecek.');
+  }
+
+  init();
+</script>
+</body>
+</html>

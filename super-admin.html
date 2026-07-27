@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kazı Takip — Süper Admin</title>
+<style>
+  :root {
+    --bg: #0f172a; --card: #1e293b; --card2: #263349;
+    --yellow: #f59e0b; --yellow-light: #fcd34d;
+    --muted: #64748b; --muted2: #94a3b8;
+    --green: #22c55e; --red: #ef4444; --line: #334155;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; background: var(--bg); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #e2e8f0; }
+  .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  .header { background: var(--card); border-bottom: 2px solid var(--yellow); padding: 14px 20px; }
+  .header h1 { font-size: 15px; margin: 0; }
+  .header p { font-size: 11px; color: var(--muted2); margin: 2px 0 0; }
+  .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+  .state-box { text-align: center; padding: 80px 20px; color: var(--muted2); font-size: 13px; }
+  .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .kpi { background: var(--card); border: 1px solid var(--line); border-radius: 11px; padding: 14px; }
+  .kpi .v { font-size: 19px; font-weight: 900; font-family: ui-monospace, monospace; }
+  .kpi .l { font-size: 10px; color: var(--muted2); margin-top: 3px; }
+  table { width: 100%; border-collapse: collapse; background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  th { text-align: left; font-size: 10.5px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; padding: 10px 14px; border-bottom: 1px solid var(--line); background: var(--card2); }
+  td { padding: 12px 14px; border-bottom: 1px solid #1c2940; font-size: 12.5px; }
+  tr:last-child td { border-bottom: none; }
+  .plan-badge { font-size: 10px; padding: 3px 9px; border-radius: 20px; font-weight: 700; }
+  .plan-deneme { background: rgba(245,158,11,0.14); color: var(--yellow-light); }
+  .plan-aktif { background: rgba(34,197,94,0.14); color: #86efac; }
+  .plan-gecikmis, .plan-iptal { background: rgba(239,68,68,0.14); color: #fca5a5; }
+  .denied { text-align: center; padding: 100px 20px; color: var(--muted2); }
+</style>
+</head>
+<body>
+  <div class="header">
+    <h1>🛡 Süper Admin Paneli</h1>
+    <p>Tüm firmalara genel bakış — sadece platform yöneticileri görür</p>
+  </div>
+  <div class="container" id="container">
+    <div class="state-box">Yükleniyor...</div>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="common.js"></script>
+<script>
+  async function init() {
+    const session = await ortakOturumKontrol('index.html');
+    if (!session) return;
+
+    const c = document.getElementById('container');
+    const { data: yetkiliMi } = await sb.rpc('is_platform_admin');
+
+    if (!yetkiliMi) {
+      c.innerHTML = `<div class="denied">🔒 Bu sayfaya erişim yetkin yok.<br><br><a href="app.html" style="color:var(--yellow-light);">← Panele dön</a></div>`;
+      return;
+    }
+
+    const [{ data: firmalar }, { data: kullanicilar }] = await Promise.all([
+      sb.from('firmalar').select('id, ad, plan_durumu, deneme_bitis_tarihi, olusturulma_tarihi').order('olusturulma_tarihi', { ascending: false }),
+      sb.from('kullanicilar').select('firma_id')
+    ]);
+
+    const kullaniciSayisi = {};
+    (kullanicilar || []).forEach(k => { kullaniciSayisi[k.firma_id] = (kullaniciSayisi[k.firma_id] || 0) + 1; });
+
+    const toplamFirma = (firmalar || []).length;
+    const denemedeki = (firmalar || []).filter(f => f.plan_durumu === 'deneme').length;
+    const aktifFirmalar = (firmalar || []).filter(f => f.plan_durumu === 'aktif');
+    const mrr = aktifFirmalar.reduce((s, f) => s + (kullaniciSayisi[f.id] || 0) * KULLANICI_BASI_FIYAT, 0);
+    const toplamKullanici = (kullanicilar || []).length;
+
+    const satirlar = (firmalar || []).map(f => `
+      <tr>
+        <td>${f.ad}</td>
+        <td>${kullaniciSayisi[f.id] || 0}</td>
+        <td><span class="plan-badge plan-${f.plan_durumu}">${PLAN_ETIKETLERI[f.plan_durumu]}${f.plan_durumu === 'deneme' ? ' · ' + Math.max(0, Math.ceil((new Date(f.deneme_bitis_tarihi) - new Date()) / 86400000)) + ' gün' : ''}</span></td>
+        <td class="mono" style="color:var(--muted2);">${new Date(f.olusturulma_tarihi).toLocaleDateString('tr-TR')}</td>
+      </tr>`).join('');
+
+    c.innerHTML = `
+      <div class="kpi-row">
+        <div class="kpi"><div class="v">${toplamFirma}</div><div class="l">Toplam Firma</div></div>
+        <div class="kpi"><div class="v">${denemedeki}</div><div class="l">Denemede</div></div>
+        <div class="kpi"><div class="v">₺${mrr.toLocaleString('tr-TR')}</div><div class="l">Aylık Gelir (MRR)</div></div>
+        <div class="kpi"><div class="v">${toplamKullanici}</div><div class="l">Toplam Kullanıcı</div></div>
+      </div>
+      <table>
+        <tr><th>Firma</th><th>Kullanıcı</th><th>Plan</th><th>Kayıt Tarihi</th></tr>
+        ${satirlar || '<tr><td colspan="4" style="color:var(--muted2);">Henüz firma yok.</td></tr>'}
+      </table>
+    `;
+  }
+
+  init();
+</script>
+</body>
+</html>
